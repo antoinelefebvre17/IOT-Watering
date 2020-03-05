@@ -1,7 +1,6 @@
 #include <DHT.h>
 #include <DHT_U.h>
 
-#include "Arduino.h"
 #include "SensorDHT.h"
 
 // pin connected to DH22 data line
@@ -23,14 +22,6 @@ void SensorDHT::start() {
   dht.humidity().getEvent(&event);
 
   humidity = event.relative_humidity;
-
-  Serial.print("celsius: ");
-  Serial.print(celsius);
-  Serial.println("C");
-
-  Serial.print("humidity: ");
-  Serial.print(humidity);
-  Serial.println("%");
 }
 
 float SensorDHT::getCelsius() {

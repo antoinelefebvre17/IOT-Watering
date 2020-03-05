@@ -1,6 +1,5 @@
 #include <WiFi.h>
 
-#include "Arduino.h"
 #include "TimeLocal.h"
 
 void TimeLocal::printLocalTime() {

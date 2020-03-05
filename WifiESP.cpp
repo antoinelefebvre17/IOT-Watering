@@ -1,6 +1,5 @@
 #include <WiFi.h>
 
-#include "Arduino.h"
 #include "WifiESP.h"
 
 void WifiESP::setup() {

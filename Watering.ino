@@ -3,6 +3,25 @@
 #include "WateringSchedules.h"
 #include "SensorDHT.h"
 
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+
+#include "CModule.hpp"
+
+#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+
+BLEServer *pServer = BLEDevice::createServer();
+BLEService *pService = pServer->createService(SERVICE_UUID);
+BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+                                        CHARACTERISTIC_UUID,
+                                        BLECharacteristic::PROPERTY_READ |
+                                        BLECharacteristic::PROPERTY_WRITE
+                                      );
+CModule c;
+
 TimeLocal timeLocal;
 WateringSchedules wateringSchedules;
 SensorDHT sensorDHT;
@@ -21,12 +40,12 @@ bool checkActivateWateringByOnlySchedules() {
 }
 
 bool checkActivateWateringByOnlyDHT() {
-  float celsius = sensorDHT.getCelsius();
-  float humidity = sensorDHT.getHumidity();
-  float minCelsius = 20.00;
-  float maxCelsius = 40.00;
-  float minHumidity = 35.00;
-  float maxHumidity = 45.00;
+  int celsius = static_cast<int>(sensorDHT.getCelsius());
+  int humidity = static_cast<int>(sensorDHT.getHumidity());
+  int minCelsius = 20;
+  int maxCelsius = 40;
+  int minHumidity = 35;
+  int maxHumidity = 45;
 
   if (celsius >= minCelsius && celsius < maxCelsius) {
     if (humidity >= minHumidity && humidity < maxHumidity) {
@@ -46,6 +65,18 @@ bool checkActivateWateringByDHTAndSchedules() {
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("Starting BLE work!");
+
+
+  BLEDevice::init("watering");
+  pService->start();
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
+  Serial.println("Characteristic defined! Now you can read it in your phone!");
 
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -62,30 +93,21 @@ void setup() {
 
 }
 
-void start_watering() {
-  if (digitalRead(LED_BUILTIN) == LOW) {
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-}
-
-void end_watering() {
-  if (digitalRead(LED_BUILTIN) == HIGH) {
-    digitalWrite(LED_BUILTIN, LOW);
-  }
-}
-
 void loop() {
   delay(1000);
 
   sensorDHT.start();
   timeLocal.printLocalTime();
 
+  c.interpret(GLOBAL_INSTANCE->getValue());
+
   if (checkActivateWateringByDHTAndSchedules() == true) {
     Serial.println("ON");
-    start_watering();
+    
+    c.start();
   } else {
     Serial.println("OFF");
-    end_watering();
+    c.stop();
   }
 
   Serial.println();
