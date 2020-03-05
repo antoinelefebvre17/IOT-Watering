@@ -1,6 +1,5 @@
 #include <DHT.h>
 
-#include "Arduino.h"
 #include "SensorDHT.h"
 
 // pin connected to DH22 data line

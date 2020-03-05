@@ -1,6 +1,5 @@
 #include <HTTPClient.h>
 
-#include "Arduino.h"
 #include "WateringSchedules.h"
 
 void WateringSchedules::printSchedules() {

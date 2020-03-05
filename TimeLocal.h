@@ -1,8 +1,6 @@
 #ifndef TimeLocal_h
 #define TimeLocal_h
 
-#include "Arduino.h"
-
 class TimeLocal {
     const char* ntpServer = "pool.ntp.org";
     const long  gmtOffset_sec = 0;

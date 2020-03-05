@@ -3,8 +3,6 @@
 
 #include <ArduinoJson.h>
 
-#include "Arduino.h"
-
 class WateringSchedules {
     const String endpoint = "https://11753b9f.ngrok.io/wateringManagement/schedules/";
     const String idWatering = "5e5596e321bba050aabba187";
