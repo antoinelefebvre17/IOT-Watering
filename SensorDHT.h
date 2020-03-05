@@ -4,14 +4,14 @@
 #include "Arduino.h"
 
 class SensorDHT {
-  float celsius;
-  float humidity;
+    float celsius;
+    float humidity;
 
   public:
-  void setup();
-  void start();
-  float getCelsius();
-  float getHumidity();
+    void setup();
+    void start();
+    float getCelsius();
+    float getHumidity();
 };
 
 #endif

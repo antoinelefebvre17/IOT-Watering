@@ -1,42 +1,42 @@
-  #include <DHT.h>
-  #include <DHT_U.h>
-  
-  #include "Arduino.h"
-  #include "SensorDHT.h"
-  
-  // pin connected to DH22 data line
-  #define DATA_PIN 14
+#include <DHT.h>
+#include <DHT_U.h>
 
-  // create DHT22 instance
-  DHT_Unified dht(DATA_PIN, DHT22);
-  
-  void SensorDHT::setup() {
-    dht.begin();
-  }
+#include "Arduino.h"
+#include "SensorDHT.h"
 
-  void SensorDHT::start() {
-    sensors_event_t event;
-    dht.temperature().getEvent(&event);
-    
-    celsius = event.temperature;
+// pin connected to DH22 data line
+#define DATA_PIN 14
 
-    dht.humidity().getEvent(&event);
+// create DHT22 instance
+DHT_Unified dht(DATA_PIN, DHT22);
 
-    humidity = event.relative_humidity;
+void SensorDHT::setup() {
+  dht.begin();
+}
 
-    Serial.print("celsius: ");
-    Serial.print(celsius);
-    Serial.println("C");
+void SensorDHT::start() {
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
 
-    Serial.print("humidity: ");
-    Serial.print(humidity);
-    Serial.println("%");
-  }
+  celsius = event.temperature;
 
-  float SensorDHT::getCelsius() {
-    return (celsius);
-  }
+  dht.humidity().getEvent(&event);
 
-  float SensorDHT::getHumidity() {
-    return (humidity);
-  }
+  humidity = event.relative_humidity;
+
+  Serial.print("celsius: ");
+  Serial.print(celsius);
+  Serial.println("C");
+
+  Serial.print("humidity: ");
+  Serial.print(humidity);
+  Serial.println("%");
+}
+
+float SensorDHT::getCelsius() {
+  return (celsius);
+}
+
+float SensorDHT::getHumidity() {
+  return (humidity);
+}
