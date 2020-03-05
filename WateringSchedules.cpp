@@ -1,5 +1,4 @@
 #include <HTTPClient.h>
-#include <ArduinoJson.h>
 
 #include "Arduino.h"
 #include "WateringSchedules.h"
