@@ -4,67 +4,14 @@
 #include <DHT.h>
 #include <DHT_U.h>
 
+#include "TimeLocal.h"
+#include "WifiESP.h"
+
 // pin connected to DH22 data line
 #define DATA_PIN 14
 
 // create DHT22 instance
 DHT_Unified dht(DATA_PIN, DHT22);
-
-class TimeLocal {
-  const char* ntpServer = "pool.ntp.org";
-  const long  gmtOffset_sec = 0;
-  const int   daylightOffset_sec = 0;
-
-  public:
-  void printLocalTime()
-  {
-    struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)){
-      Serial.println("Failed to obtain time");
-      return;
-    }
-    Serial.println(&timeinfo, "%H:%M:%S");
-  }
-
-  int getHour() {
-    struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)){
-      Serial.println("Failed to obtain time");
-      return (-1);
-    }
-    return (timeinfo.tm_hour);
-  }
-
-   int getMinutes() {
-    struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)){
-      Serial.println("Failed to obtain time");
-      return (-1);
-    }
-    return (timeinfo.tm_min);
-  }
-
-  void setup() {
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  }
-};
-
-class Setup {
-  const char* ssid = "Antoine_29";
-  const char* password =  "antoine29";
-
-  public:
-  void wifi() {
-      WiFi.begin(ssid, password);
- 
-      while (WiFi.status() != WL_CONNECTED) {
-        delay(1000);
-        Serial.println("Connecting to WiFi..");
-      }
- 
-      Serial.println("Connected to the WiFi network");
-  }
-};
 
 class HttpRequest {
   const String endpoint = "https://4ab8a3ec.ngrok.io/wateringManagement/schedules/";
@@ -202,9 +149,9 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
 
-  Setup setup;
+  WifiESP wifiESP;
 
-  setup.wifi();
+  wifiESP.setup();
   httpRequest.getWateringSchedules();
   httpRequest.printSchedules();
 
@@ -290,5 +237,7 @@ void loop() {
     Serial.println("OFF");
     end_watering();
   }
+  
+  Serial.println();
 
 }
