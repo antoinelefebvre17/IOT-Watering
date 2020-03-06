@@ -8,7 +8,7 @@ void TimeLocal::printLocalTime() {
     Serial.println("Failed to obtain time");
     return;
   }
-  Serial.println(&timeinfo, "%H:%M:%S");
+  Serial.println(&timeinfo, "Local time: %H:%M:%S");
 }
 
 int TimeLocal::getHour() {

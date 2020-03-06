@@ -7,57 +7,13 @@
 #define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
-CModule c;
-
-TimeLocal timeLocal;
-WateringSchedules wateringSchedules;
-SensorDHT sensorDHT;
-
-bool checkActivateWateringByOnlySchedules() {
-  int **schedulesWatering = wateringSchedules.getSchedules();
-
-  for (int i = 0; i < wateringSchedules.getSizeOfSchedulesWatering(); ++i) {
-    if (timeLocal.getHour() >= schedulesWatering[i][0] && timeLocal.getHour() <= schedulesWatering[i][2]) {
-      if (timeLocal.getMinutes() >= schedulesWatering[i][1] && timeLocal.getMinutes() < schedulesWatering[i][3]) {
-        return (true);
-      }
-    }
-  }
-  return (false);
-}
-
-bool checkActivateWateringByOnlyDHT() {
-  int celsius = static_cast<int>(sensorDHT.getCelsius());
-  int humidity = static_cast<int>(sensorDHT.getHumidity());
-  int minCelsius = 20;
-  int maxCelsius = 40;
-  int minHumidity = 35;
-  int maxHumidity = 50;
-
-  if (celsius >= minCelsius && celsius < maxCelsius) {
-    if (humidity >= minHumidity && humidity < maxHumidity) {
-      return (true);
-    }
-  }
-  return (false);
-}
-
-bool checkActivateWateringByDHTAndSchedules() {
-  if (checkActivateWateringByOnlyDHT() == true && checkActivateWateringByOnlySchedules() == true) {
-    return (true);
-  } else {
-    return (false);
-  }
-}
+CModule *c = new CModule();
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting BLE work!");
 
-
-
   BLEDevice::init("watering");
-
   BLEServer *pServer = BLEDevice::createServer();
   BLEService *pService = pServer->createService(SERVICE_UUID);
   BLECharacteristic *pCharacteristic = pService->createCharacteristic(
@@ -78,56 +34,17 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   WifiESP wifiESP;
-
   wifiESP.setup();
 
-  wateringSchedules.getWateringSchedules();
-  wateringSchedules.printSchedules();
-
-  timeLocal.setup();
-
-  sensorDHT.setup();
-
+  c->init();
 }
 
 void loop() {
-  delay(1000);
-
-  sensorDHT.start();
-  timeLocal.printLocalTime();
-
-  c.interpret(GLOBAL_INSTANCE->getValue());
-
-  switch (MODE) {
-    case START: MValveActuator::turnOn();
-      break;
-    case STOP: MValveActuator::turnOff();
-      break;
-    case SCHEDULES:
-      if (checkActivateWateringByOnlySchedules() == true) {
-        MValveActuator::turnOn();
-      } else {
-        MValveActuator::turnOff();
-      }
-      break;
-    case SENSOR:
-      if (checkActivateWateringByOnlyDHT() == true) {
-        MValveActuator::turnOn();
-      } else {
-        MValveActuator::turnOff();
-      }
-      break;
-    case SCHEDULESSENSOR:
-      if (checkActivateWateringByDHTAndSchedules() == true) {
-        MValveActuator::turnOn();
-      } else {
-        MValveActuator::turnOff();
-      }
-      break;
-    case NONE:
-    default: break;
+  TimeLocal::printLocalTime();
+  if (GLOBAL_INSTANCE) { 
+    c->interpret(GLOBAL_INSTANCE->getValue());
+    c->process();
   }
-  Serial.println(MODE);
-  Serial.println();
 
+  delay(1000);
 }

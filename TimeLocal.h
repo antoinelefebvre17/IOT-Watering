@@ -7,7 +7,7 @@ class TimeLocal {
     const int   daylightOffset_sec = 0;
 
   public:
-    void printLocalTime();
+    static void printLocalTime();
     int getHour();
     int getMinutes();
     void setup();

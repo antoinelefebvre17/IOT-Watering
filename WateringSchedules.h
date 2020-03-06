@@ -3,10 +3,11 @@
 
 #include <ArduinoJson.h>
 
-class WateringSchedules {
-    const String endpoint = "https://11753b9f.ngrok.io/wateringManagement/schedules/";
-    const String idWatering = "5e5596e321bba050aabba187";
+const String endpoint = "https://fed89fd0.ngrok.io/wateringManagement/schedules/";
+const String idWatering = "5e5596e321bba050aabba187";
 
+class WateringSchedules {
+private:
     int **schedulesWatering;
     int sizeOfSchedulesWatering;
 
